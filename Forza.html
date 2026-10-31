@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FORZA HORIZON 6</title>
+  <style>
+    body {
+      margin:0; font-family:Arial,sans-serif; background:black; color:white; }
+    .hero { position:relative;
+  height:100vh;
+  display:flex;
+  justify-content:left;
+  align-items:center;
+  text-align:left;
+  overflow:hidden; 
+          }
+    .hero video { position:absolute; width:100%; height:100%; object-fit:cover; }
+    .overlay { position:absolute; width:100%; height:100%; background:rgba(0,0,0,0.5); }
+    .content { position:relative; padding:100px 40px; }
+    h1 { font-size:70px; font-style:italic; margin:0; }
+    .pink { color:#ff0080; }
+    p { color:#ccc; max-width:400px; }
+
+    .btn { display:inline-block; padding:12px 20px; margin-top:20px; margin-right:10px; text-decoration:none; color:white; border-radius:5px; cursor:pointer; border:none; font-weight:bold; }
+    .btn-pink { background:#ff0080; }
+    .btn-white { background:#444; }
+
+    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:10; }
+    .modal-box { background:#1a1a1a; padding:20px; width:90%; max-width:420px; border-radius:12px; position:relative; }
+    .close { position:absolute; top:10px; right:15px; font-size:25px; cursor:pointer; }
+
+    .price-box { background:#222; padding:12px; margin:10px 0; border-radius:8px; border:2px solid #333; cursor:pointer; }
+    .price-box.selected { border-color:#ff0080; background:#2a1a22; }
+    .price-box h3 { margin:0; }
+    .price-box p { margin:5px 0; color:#ff0080; font-weight:bold; }
+
+    .trailer-img { width:100%; height:200px; object-fit:cover; border-radius:8px; margin-top:10px; background:#000; }
+
+    .achievement {
+      display:none;
+      position:fixed;
+      top:0; left:0;
+      width:100%; height:100%;
+      background:rgba(0,0,0,0.9);
+      justify-content:center;
+      align-items:center;
+      z-index:20;
+    }
+    .ach-box {
+      background:linear-gradient(135deg, #1a1a1a, #2a1a22);
+      padding:30px;
+      width:90%;
+      max-width:400px;
+      border-radius:15px;
+      text-align:center;
+      border:2px solid #ff0080;
+      box-shadow:0 0 30px rgba(255,0,128,0.5);
+    }
+    .ach-title { color:#ff0080; font-size:14px; letter-spacing:2px; margin:0; }
+    .ach-name { font-size:24px; margin:10px 0; }
+    .ach-desc { font-size:14px; color:#aaa; }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <video autoplay muted loop playsinline><source src="2026-10-28-043841269.mp4"></video>
+  <div class="overlay"></div>
+  <div class="content">
+    <h1>FORZA <br><span class="pink">HORIZON 6</span></h1>
+    <p>Real engine sounds. This is not gameplay. This is reality.</p>
+    <button class="btn btn-pink" onclick="openTrailer()">WATCH TRAILER</button>
+    <button class="btn btn-white" onclick="openPreorder()">PRE-ORDER</button>
+  </div>
+</div>
+
+<div id="trailerModal" class="modal">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal('trailerModal')">&times;</span>
+    <h2>Official Trailer</h2>
+    <p>Experience Japan like never before.</p>
+    <img src="trailer.jpg" alt="Forza Trailer" class="trailer-img" onerror="this.style.display='none'">
+    </div>
+  </div>
+a
+<div id="preorderModal" class="modal">
+  <div class="modal-box">
+    <span class="close" onclick="closeModal('preorderModal')">&times;</span>
+    <h2>Choose Edition</h2>
+    <p id="selectedText" style="color:#ff0080; font-size:13px;">Click to select:</p>
+
+    <div class="price-box" id="standard" onclick="selectEdition('standard', 69.99)">
+      <h3>Standard Edition</h3>
+      <p>$69.99</p>
+      <small>Base game + Early car pack</small>
+    </div>
+
+    <div class="price-box" id="deluxe" onclick="selectEdition('deluxe', 89.99)">
+      <h3>Deluxe Edition</h3>
+      <p>$89.99</p>
+      <small>Base game + Car Pass + VIP</small>
+    </div>
+
+    <div class="price-box" id="premium" onclick="selectEdition('premium', 119.99)">
+      <h3>Premium Edition</h3>
+      <p>$119.99</p>
+      <small>Everything + 4 Days Early Access</small>
+    </div>
+
+    <button class="btn btn-pink" style="width:100%;" onclick="doPreorder()">PRE-ORDER NOW - <span id="priceLabel">Select Edition</span></button>
+  </div>
+</div>
+
+<div id="achievement" class="achievement">
+  <div class="ach-box">
+    <p class="ach-title">ACHIEVEMENT UNLOCKED</p>
+    <h2 class="ach-name">HORIZON LEGEND</h2>
+    <p class="ach-desc">You just pre-ordered Forza Horizon 6 <span id="achEdition"></span>!<br>Welcome to Japan, driver. See you at the festival.</p>
+    <p style="color:#ff0080; margin-top:15px; font-weight:bold;">+1000 CR - Added to garage</p>
+    <button class="btn btn-pink" style="width:100%; margin-top:15px;" onclick="closeAchievement()">LET'S RIDE</button>
+  </div>
+</div>
+
+<script>
+  let chosenEdition = "";
+  let chosenPrice = 0;
+
+  function openTrailer() {
+    document.getElementById('trailerModal').style.display = 'flex';
+  }
+  function openPreorder() {
+    document.getElementById('preorderModal').style.display = 'flex';
+  }
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function selectEdition(id, price) {
+    document.getElementById('standard').classList.remove('selected');
+    document.getElementById('deluxe').classList.remove('selected');
+    document.getElementById('premium').classList.remove('selected');
+
+    document.getElementById(id).classList.add('selected');
+    
+    chosenEdition = id;
+    chosenPrice = price;
+
+    document.getElementById('priceLabel').innerText = "$" + price;
+    document.getElementById('selectedText').innerText = "Selected: " + id.toUpperCase();
+  }
+
+  function doPreorder() {
+    if (chosenEdition == "") {
+      alert("Please select an edition first!");
+      return;
+    }
+    document.getElementById('preorderModal').style.display = 'none';
+    
+    document.getElementById('achEdition').innerText = "(" + chosenEdition.toUpperCase() + " - $" + chosenPrice + ")";
+    document.getElementById('achievement').style.display = 'flex';
+  }
+
+  function closeAchievement() {
+    document.getElementById('achievement').style.display = 'none';
+  }
+
+  window.onclick = function(e) {
+    if (e.target.className == 'modal' || e.target.className == 'achievement') {
+      e.target.style.display = 'none';
+    }
+  }
+</script>
+
+</body>
+</html>
